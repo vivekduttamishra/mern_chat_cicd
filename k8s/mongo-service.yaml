@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-service
+spec:
+  selector:
+    app: mongo
+  ports:
+    - protocol: TCP
+      port: 27018       # Expose MongoDB on 27018
+      targetPort: 27018  # Inside the container
+  clusterIP: None  # Use headless service for direct Pod-to-Pod connection

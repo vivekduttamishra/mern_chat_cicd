@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  chat_backend:
+    build:
+      context: .
+      dockerfile: chat-server/Dockerfile  # Specify Dockerfile location
+    ports:
+      - "80:80"
+    depends_on:
+      - mongo
+    environment:
+      - MONGO_URI=mongodb://mongo:27018/chatdb
+
+  mongo:
+    image: mongo
+    container_name: mongo_chat_container
+    ports:
+      - "27018:27017"
