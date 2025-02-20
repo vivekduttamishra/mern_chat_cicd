@@ -1,0 +1,32 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  # Adjust the branch as needed
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH Key
+        run: |
+          echo "${{ secrets.SSH_KEY }}" | tr -d '\r' | awk 'BEGIN {print "-----BEGIN RSA PRIVATE KEY-----"} {print} END {print "-----END RSA PRIVATE KEY-----"}' > private_key.pem
+          chmod 600 private_key.pem
+
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no -i private_key.pem $ubuntu@$34.227.159.8 << 'EOF'
+            cd ~/mern_chat_ci_cd
+            git pull origin main  # Adjust the branch if needed
+            cd frontend
+            npm install
+            npm run build
+            cd ../chat-server
+            npm install
+            pm2 restart chat_server || pm2 start server.js --name "chat_server"  # Restart or start your Node.js app
+          EOF
