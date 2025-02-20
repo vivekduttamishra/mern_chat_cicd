@@ -1,0 +1,36 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches:
+      - main  # Trigger deploy on push to the main branch (you can change this to your branch)
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # Set up SSH for EC2
+      - name: Set up SSH
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      # Deploy to EC2 (copy files)
+      - name: Deploy to EC2
+        run: |
+          ssh -o StrictHostKeyChecking=no ec2-user@34.227.159.8 << 'EOF'
+            cd ./mern_chat_cicd
+            git pull origin main  # Pull the latest code from your repository
+            cd frontend
+            npm install
+            npm run build
+            cd ../chat-server
+            npm install
+            pm2 restart chat_server || pm2 start server.js --name "chat_server"  # Restart or start your Node.js app
+
+          EOF

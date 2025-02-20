@@ -5,7 +5,7 @@ function App() {
 
   return (
    <div>
-    <h1>Chat Server V2</h1>
+    <h1>AWS Chat Server V2.1</h1>
     <Chat/>
    </div>
   )
